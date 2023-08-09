@@ -1,5 +1,5 @@
 #--------------------------------------------------------------------------
-# Creacion:          04-01-2021
+# Creacion:          septiembre 2023
 # Autor:             Julio C.
 # Contacto:          jcms2665@gmail.com
 # Objetivo:          Tabla de vida
@@ -29,22 +29,22 @@ View(tabla)
 x<-head(tabla,5)
 
 
-#4. Calcular las tasas especÌficas de mortalidad
+#4. Calcular las tasas espec√≠ficas de mortalidad
 tabla <- mutate(tabla, nmx = D/N)
 
 
-#5. Obtener el n˙mero promedio de aÒos persona vividos en el intervalo por aquellos que murieron, es decir: nLx 
+#5. Obtener el n√∫mero promedio de a√±os persona vividos en el intervalo por aquellos que murieron, es decir: nLx 
 #Los vamos a tomar prestados de Keyfitz y Flieger (1971)
 kfnax <- read.dta("http://data.princeton.edu/eco572/datasets/kfnax.dta")
 names(kfnax)[1]<-"edad"
 
 
-#6. Unimos los aÒos persona vividos a la tabla que tenÌamos usando la edad como pivote
+#6. Unimos los a√±os persona vividos a la tabla que ten√≠amos usando la edad como pivote
 tabla <- inner_join(tabla, kfnax, by="edad")
 
 
-#7. Checamos los aÒos persona vividos para las edades de 0-1 y 1-4
-cond <- rep(tabla[1,"nmx"] >= 0.107, 2) # Usamos una expresiÛn como ayuda
+#7. Checamos los a√±os persona vividos para las edades de 0-1 y 1-4
+cond <- rep(tabla[1,"nmx"] >= 0.107, 2) # Usamos una expresi√≥n como ayuda
 tabla[1:2,"nax"] <- ifelse(cond, c(0.330, 1.352), tabla[1:2,"nax"] <- c(0.045, 1.651) + c(2.684, -2.816)* tabla[1,"nmx"])
 last <- nrow(tabla) 
 tabla[last,"nax"] <- 1/ tabla[last,"nmx"]
@@ -62,11 +62,11 @@ tabla[last, c("q","p")] = c(1, 0)
 tabla <- mutate(tabla, lx = 100000 * cumprod( c(1, p[-last])))
 
 
-#11. Calcular el n˙mero de personas que murieron entre las edades x y x+n
+#11. Calcular el n√∫mero de personas que murieron entre las edades x y x+n
 tabla <- mutate(tabla, d = c(-diff(lx), lx[last]))
 
 
-#12.Calcular los sobrevivientes y AÒos Persona Vividos arriba de la edad x, es decir: nTx=???a=xnLa
+#12.Calcular los sobrevivientes y A√±os Persona Vividos arriba de la edad x, es decir: nTx=???a=xnLa
 tabla <- mutate(tabla, L =  (lx - d) * n +  d * nax,T = sum(L) - cumsum(L) + L)
 
 #13. Esperanza de vida ex=nTx / lx
